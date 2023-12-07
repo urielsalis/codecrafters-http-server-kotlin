@@ -10,11 +10,16 @@ class HttpServer(val directory: String?) {
             "/user-agent".toRegex() to ::handleUserAgent,
             "/files/.*".toRegex() to ::handleGetFiles,
         )
+    val postHandlers =
+        mapOf(
+            "/files/.*".toRegex() to ::handlePostFiles,
+        )
 
     fun handle(request: Request): Response {
         val response =
             when (request.method) {
                 Method.GET -> getHandler(request, getHandlers)
+                Method.POST -> getHandler(request, postHandlers)
                 else -> null
             }
         if (response != null) {
@@ -71,5 +76,13 @@ class HttpServer(val directory: String?) {
             ),
             body = body,
         )
+    }
+
+    private fun handlePostFiles(request: Request): Response {
+        val path = request.path.removePrefix("/files/")
+        val file = File(directory, path)
+        file.createNewFile()
+        file.writeText(request.body ?: "")
+        return Response(StatusCode.CREATED)
     }
 }
