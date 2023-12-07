@@ -1,7 +1,5 @@
 package com.urielsalis.http
 
-import java.io.InputStreamReader
-import java.io.OutputStream
 import java.net.Socket
 
 class ConnectionHandler(clientSocket: Socket, val handler: (Request) -> Response) {
@@ -11,7 +9,7 @@ class ConnectionHandler(clientSocket: Socket, val handler: (Request) -> Response
     fun handle() {
         val lines = mutableListOf<String>()
         var line = input.readLine()
-        while(line.isNotBlank()) {
+        while (line.isNotBlank()) {
             lines.add(line)
             line = input.readLine()
         }
