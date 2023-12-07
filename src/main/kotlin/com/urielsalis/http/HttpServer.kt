@@ -1,11 +1,14 @@
 package com.urielsalis.http
 
-object HttpServer {
+import java.io.File
+
+class HttpServer(val directory: String?) {
     val getHandlers =
         mapOf(
             "/".toRegex() to ::handleRoot,
             "/echo/.*".toRegex() to ::handleEcho,
             "/user-agent".toRegex() to ::handleUserAgent,
+            "/files/.*".toRegex() to ::handleGetFiles,
         )
 
     fun handle(request: Request): Response {
@@ -50,6 +53,23 @@ object HttpServer {
             StatusCode.OK,
             mapOf("Content-Type" to "text/plain", "Content-Length" to agent.length.toString()),
             body = agent,
+        )
+    }
+
+    private fun handleGetFiles(request: Request): Response {
+        val path = request.path.removePrefix("/files/")
+        val file = File(directory, path)
+        if (!file.exists()) {
+            return Response(StatusCode.NOT_FOUND)
+        }
+        val body = file.readText()
+        return Response(
+            StatusCode.OK,
+            mapOf(
+                "Content-Type" to "application/octet-stream",
+                "Content-Length" to body.length.toString(),
+            ),
+            body = body,
         )
     }
 }

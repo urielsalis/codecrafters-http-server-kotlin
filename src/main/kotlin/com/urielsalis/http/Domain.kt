@@ -9,7 +9,7 @@ data class Request(
 
 data class Response(
     val status: StatusCode,
-    val headers: Map<String, String> = mapOf(),
+    val headers: Map<String, String> = mapOf("Content-Length" to "0"),
     val body: String? = null,
 )
 
