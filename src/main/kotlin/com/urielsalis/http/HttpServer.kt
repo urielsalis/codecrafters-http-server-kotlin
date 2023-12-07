@@ -5,6 +5,7 @@ object HttpServer {
         mapOf(
             "/".toRegex() to ::handleRoot,
             "/echo/.*".toRegex() to ::handleEcho,
+            "/user-agent".toRegex() to ::handleUserAgent,
         )
 
     fun handle(request: Request): Response {
@@ -40,6 +41,15 @@ object HttpServer {
             StatusCode.OK,
             mapOf("Content-Type" to "text/plain", "Content-Length" to path.length.toString()),
             body = path,
+        )
+    }
+
+    private fun handleUserAgent(request: Request): Response {
+        val agent = request.headers["User-Agent"] ?: return Response(StatusCode.BAD_REQUEST)
+        return Response(
+            StatusCode.OK,
+            mapOf("Content-Type" to "text/plain", "Content-Length" to agent.length.toString()),
+            body = agent,
         )
     }
 }
