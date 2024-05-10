@@ -23,7 +23,14 @@ class ConnectionHandler(clientSocket: Socket, val handler: (Request) -> Response
         }
         val request = parseRequest(lines, body)
         val response = handler(request)
+        if(request.isGzipAllowed()) {
+            return write(response.gzipCompress())
+        }
         write(response)
+    }
+
+    private fun Response.gzipCompress(): Response {
+        return this.copy(headers = this.headers + ("Content-Encoding" to "gzip"))
     }
 
     private fun parseRequest(
